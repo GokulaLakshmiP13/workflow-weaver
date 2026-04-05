@@ -1,56 +1,51 @@
 import { NodeType } from '@/lib/workflow-manager';
+import { Users, Filter, GitFork, Zap, Clock, CircleStop } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export const NODE_TYPE_CONFIG: Record<NodeType, {
   color: string;
-  bgClass: string;
-  borderClass: string;
-  icon: string;
+  icon: LucideIcon;
+  label: string;
   description: string;
 }> = {
   audience: {
-    color: 'hsl(220, 75%, 56%)',
-    bgClass: 'bg-[hsl(220,75%,56%)]',
-    borderClass: 'border-[hsl(220,75%,56%)]',
-    icon: '👥',
-    description: 'Define target audience segment',
+    color: '#3b5fe0',
+    icon: Users,
+    label: 'Audience',
+    description: 'Target segment',
   },
   filter: {
-    color: 'hsl(32, 95%, 55%)',
-    bgClass: 'bg-[hsl(32,95%,55%)]',
-    borderClass: 'border-[hsl(32,95%,55%)]',
-    icon: '🔍',
-    description: 'Filter by conditions',
+    color: '#e07b24',
+    icon: Filter,
+    label: 'Filter',
+    description: 'Apply conditions',
   },
   split: {
-    color: 'hsl(280, 65%, 55%)',
-    bgClass: 'bg-[hsl(280,65%,55%)]',
-    borderClass: 'border-[hsl(280,65%,55%)]',
-    icon: '🔀',
-    description: 'A/B split traffic',
+    color: '#8b45d6',
+    icon: GitFork,
+    label: 'Split',
+    description: 'A/B test traffic',
   },
   action: {
-    color: 'hsl(150, 60%, 42%)',
-    bgClass: 'bg-[hsl(150,60%,42%)]',
-    borderClass: 'border-[hsl(150,60%,42%)]',
-    icon: '⚡',
-    description: 'Execute action (email, SMS, etc.)',
+    color: '#1a9a6b',
+    icon: Zap,
+    label: 'Action',
+    description: 'Send email / SMS',
   },
   wait: {
-    color: 'hsl(45, 93%, 52%)',
-    bgClass: 'bg-[hsl(45,93%,52%)]',
-    borderClass: 'border-[hsl(45,93%,52%)]',
-    icon: '⏳',
-    description: 'Wait for duration or event',
+    color: '#d4a017',
+    icon: Clock,
+    label: 'Wait',
+    description: 'Delay execution',
   },
   end: {
-    color: 'hsl(0, 0%, 45%)',
-    bgClass: 'bg-[hsl(0,0%,45%)]',
-    borderClass: 'border-[hsl(0,0%,45%)]',
-    icon: '🏁',
-    description: 'End workflow',
+    color: '#6b7280',
+    icon: CircleStop,
+    label: 'End',
+    description: 'Terminate flow',
   },
 };
 
-export const NODE_WIDTH = 180;
-export const NODE_HEIGHT = 72;
-export const CONNECTOR_RADIUS = 8;
+export const NODE_WIDTH = 192;
+export const NODE_HEIGHT = 68;
+export const CONNECTOR_RADIUS = 7;
