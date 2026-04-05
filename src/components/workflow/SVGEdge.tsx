@@ -16,24 +16,22 @@ export function SVGEdge({ edge, sourceNode, targetNode, onDoubleClick }: Props) 
   const ty = targetNode.y;
 
   const dy = Math.abs(ty - sy);
-  const cp = Math.max(50, dy * 0.5);
+  const cp = Math.max(40, dy * 0.45);
 
   const d = `M ${sx} ${sy} C ${sx} ${sy + cp}, ${tx} ${ty - cp}, ${tx} ${ty}`;
 
   return (
     <g onDoubleClick={() => onDoubleClick(edge.id)}>
-      {/* Invisible wider path for easier clicking */}
-      <path d={d} fill="none" stroke="transparent" strokeWidth={16} style={{ cursor: 'pointer' }} />
+      <path d={d} fill="none" stroke="transparent" strokeWidth={14} style={{ cursor: 'pointer' }} />
       <path
         d={d}
         fill="none"
-        stroke="hsl(220, 20%, 65%)"
-        strokeWidth={2}
-        strokeDasharray="none"
-        markerEnd=""
+        stroke="#b4b9c4"
+        strokeWidth={1.5}
+        strokeLinecap="round"
       />
-      {/* Arrow at target */}
-      <circle cx={tx} cy={ty} r={3} fill="hsl(220, 20%, 65%)" />
+      {/* Arrowhead dot at target */}
+      <circle cx={tx} cy={ty} r={2.5} fill="#b4b9c4" />
     </g>
   );
 }
@@ -47,10 +45,10 @@ interface TempEdgeProps {
 
 export function SVGTempEdge({ startX, startY, endX, endY }: TempEdgeProps) {
   const dy = Math.abs(endY - startY);
-  const cp = Math.max(50, dy * 0.5);
+  const cp = Math.max(40, dy * 0.45);
   const d = `M ${startX} ${startY} C ${startX} ${startY + cp}, ${endX} ${endY - cp}, ${endX} ${endY}`;
 
   return (
-    <path d={d} fill="none" stroke="hsl(220, 70%, 56%)" strokeWidth={2} strokeDasharray="6 4" opacity={0.7} />
+    <path d={d} fill="none" stroke="#3b5fe0" strokeWidth={1.5} strokeDasharray="6 4" opacity={0.6} strokeLinecap="round" />
   );
 }

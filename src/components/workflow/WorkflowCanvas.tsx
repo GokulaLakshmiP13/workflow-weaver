@@ -5,6 +5,7 @@ import { SVGEdge, SVGTempEdge } from './SVGEdge';
 import { NodeConfigModal } from './NodeConfigModal';
 import { NODE_WIDTH, NODE_HEIGHT } from '@/lib/workflow-constants';
 import { NodeType, WorkflowNode } from '@/lib/workflow-manager';
+import { Code2, Copy, X } from 'lucide-react';
 
 interface DragState {
   type: 'node';
@@ -49,20 +50,17 @@ export function WorkflowCanvas() {
     return { x, y };
   }, [viewBox]);
 
-  // Drop handler
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const type = e.dataTransfer.getData('workflow/node-type') as NodeType;
     if (!type) return;
     const pt = getSVGPoint(e.clientX, e.clientY);
     const node = addNode(type, pt.x - NODE_WIDTH / 2, pt.y - NODE_HEIGHT / 2);
-    // Open config modal
     setConfigNode(node);
   }, [getSVGPoint, addNode]);
 
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
 
-  // Node drag
   const onNodeMouseDown = useCallback((e: React.MouseEvent, nodeId: string) => {
     const pt = getSVGPoint(e.clientX, e.clientY);
     const node = nodes.find(n => n.id === nodeId);
@@ -71,7 +69,6 @@ export function WorkflowCanvas() {
     setDragState({ type: 'node', nodeId, offsetX: pt.x - node.x, offsetY: pt.y - node.y });
   }, [getSVGPoint, nodes]);
 
-  // Connector drag (edge creation)
   const onConnectorMouseDown = useCallback((e: React.MouseEvent, nodeId: string) => {
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return;
@@ -83,15 +80,11 @@ export function WorkflowCanvas() {
 
   const onConnectorMouseUp = useCallback((_e: React.MouseEvent, nodeId: string) => {
     if (connectState) {
-      const result = addEdge(connectState.sourceId, nodeId);
-      if (!result) {
-        // Could show error toast
-      }
+      addEdge(connectState.sourceId, nodeId);
       setConnectState(null);
     }
   }, [connectState, addEdge]);
 
-  // Canvas pan
   const onCanvasMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.target === svgRef.current || (e.target as SVGElement).classList.contains('canvas-bg')) {
       setSelectedNode(null);
@@ -99,7 +92,6 @@ export function WorkflowCanvas() {
     }
   }, [viewBox]);
 
-  // Global mouse move/up
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (dragState) {
@@ -132,7 +124,6 @@ export function WorkflowCanvas() {
     };
   }, [dragState, connectState, panState, getSVGPoint, updateNodePosition, viewBox]);
 
-  // Zoom
   const onWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
     const scale = e.deltaY > 0 ? 1.08 : 0.92;
@@ -146,7 +137,6 @@ export function WorkflowCanvas() {
     });
   }, [getSVGPoint]);
 
-  // Delete selected
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedNode && !configNode) {
@@ -158,37 +148,40 @@ export function WorkflowCanvas() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [selectedNode, configNode, removeNode]);
 
-  // Grid pattern
-  const gridSize = 24;
+  const gridSize = 20;
 
   return (
     <div className="flex-1 relative overflow-hidden bg-[hsl(var(--canvas-bg))]">
       {/* Toolbar */}
-      <div className="absolute top-3 right-3 z-10 flex gap-2">
+      <div className="absolute top-3 right-3 z-10 flex gap-1.5">
         <button
           onClick={() => setShowJSON(!showJSON)}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-card text-foreground border border-border workflow-shadow hover:bg-accent transition-colors"
-          style={{ fontFamily: 'var(--font-mono)' }}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium rounded-md bg-card text-muted-foreground border border-border workflow-shadow hover:text-foreground transition-colors"
         >
-          {showJSON ? 'Close' : '{ } Export JSON'}
+          <Code2 size={13} />
+          {showJSON ? 'Hide' : 'JSON'}
         </button>
         <button
           onClick={() => {
             const json = JSON.stringify(toJSON(), null, 2);
             navigator.clipboard.writeText(json);
           }}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary text-primary-foreground workflow-shadow hover:opacity-90 transition-opacity"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium rounded-md bg-primary text-primary-foreground workflow-shadow hover:opacity-90 transition-opacity"
         >
-          💾 Save
+          <Copy size={13} />
+          Export
         </button>
       </div>
 
-      {/* Info */}
+      {/* Empty state */}
       {nodes.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center">
-            <p className="text-muted-foreground text-sm">Drag nodes from the sidebar to get started</p>
-            <p className="text-muted-foreground/50 text-xs mt-1">Connect nodes by dragging from output ● to input ○</p>
+            <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
+              <Code2 size={20} className="text-muted-foreground/60" />
+            </div>
+            <p className="text-muted-foreground text-[13px] font-medium">Drop components here to start</p>
+            <p className="text-muted-foreground/40 text-[11px] mt-1">Connect outputs to inputs to define flow</p>
           </div>
         </div>
       )}
@@ -203,10 +196,9 @@ export function WorkflowCanvas() {
         onWheel={onWheel}
         style={{ cursor: panState ? 'grabbing' : 'default' }}
       >
-        {/* Grid */}
         <defs>
           <pattern id="grid" width={gridSize} height={gridSize} patternUnits="userSpaceOnUse">
-            <circle cx={gridSize / 2} cy={gridSize / 2} r={1} fill="hsl(220, 15%, 82%)" opacity={0.5} />
+            <circle cx={gridSize / 2} cy={gridSize / 2} r={0.8} fill="#c4c8d0" opacity={0.4} />
           </pattern>
         </defs>
         <rect
@@ -218,7 +210,6 @@ export function WorkflowCanvas() {
           fill="url(#grid)"
         />
 
-        {/* Edges */}
         {edges.map(edge => {
           const source = nodes.find(n => n.id === edge.source);
           const target = nodes.find(n => n.id === edge.target);
@@ -234,7 +225,6 @@ export function WorkflowCanvas() {
           );
         })}
 
-        {/* Temp edge while connecting */}
         {connectState && (
           <SVGTempEdge
             startX={connectState.startX}
@@ -244,7 +234,6 @@ export function WorkflowCanvas() {
           />
         )}
 
-        {/* Nodes */}
         {nodes.map(node => (
           <SVGNode
             key={node.id}
@@ -258,7 +247,6 @@ export function WorkflowCanvas() {
         ))}
       </svg>
 
-      {/* Config Modal */}
       {configNode && (
         <NodeConfigModal
           node={configNode}
@@ -267,14 +255,15 @@ export function WorkflowCanvas() {
         />
       )}
 
-      {/* JSON Export Panel */}
       {showJSON && (
-        <div className="absolute bottom-3 right-3 z-10 w-[420px] max-h-[60vh] bg-card border border-border rounded-xl workflow-shadow-lg overflow-hidden">
+        <div className="absolute bottom-3 right-3 z-10 w-[400px] max-h-[55vh] bg-card border border-border rounded-lg workflow-shadow-lg overflow-hidden">
           <div className="px-4 py-2 border-b border-border flex items-center justify-between">
-            <span className="text-xs font-semibold text-muted-foreground">Workflow JSON</span>
-            <button onClick={() => setShowJSON(false)} className="text-muted-foreground hover:text-foreground text-sm">✕</button>
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Output</span>
+            <button onClick={() => setShowJSON(false)} className="w-5 h-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground">
+              <X size={12} />
+            </button>
           </div>
-          <pre className="p-4 text-[11px] overflow-auto max-h-[50vh] text-foreground" style={{ fontFamily: 'var(--font-mono)' }}>
+          <pre className="p-4 text-[11px] leading-relaxed overflow-auto max-h-[48vh] text-foreground" style={{ fontFamily: 'var(--font-mono)' }}>
             {JSON.stringify(toJSON(), null, 2)}
           </pre>
         </div>
