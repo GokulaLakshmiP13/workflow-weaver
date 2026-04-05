@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, useSyncExternalStore } from 'react';
+import React, { createContext, useContext, useCallback, useRef, useSyncExternalStore } from 'react';
 import { WorkflowManager, WorkflowNode, WorkflowEdge, NodeType } from '@/lib/workflow-manager';
 
 interface WorkflowContextValue {
@@ -18,10 +18,25 @@ const WorkflowContext = createContext<WorkflowContextValue | null>(null);
 
 const manager = new WorkflowManager();
 
+// Stable snapshot cache to avoid infinite loops with useSyncExternalStore
+let cachedNodes = manager.getNodes();
+let cachedEdges = manager.getEdges();
+let cachedSnapshot = { nodes: cachedNodes, edges: cachedEdges };
+
+manager.subscribe(() => {
+  cachedNodes = manager.getNodes();
+  cachedEdges = manager.getEdges();
+  cachedSnapshot = { nodes: cachedNodes, edges: cachedEdges };
+});
+
+function getSnapshot() {
+  return cachedSnapshot;
+}
+
 export function WorkflowProvider({ children }: { children: React.ReactNode }) {
   const snapshot = useSyncExternalStore(
     useCallback((cb: () => void) => manager.subscribe(cb), []),
-    () => ({ nodes: manager.getNodes(), edges: manager.getEdges() })
+    getSnapshot
   );
 
   const value: WorkflowContextValue = {
