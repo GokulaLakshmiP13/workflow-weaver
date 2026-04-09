@@ -162,17 +162,15 @@ export function WorkflowCanvas() {
           {showJSON ? 'Hide' : 'JSON'}
         </button>
         <button
-          onClick={() => {
+        onClick={() => {
             const json = JSON.stringify(toJSON(), null, 2);
-            try {
-              navigator.clipboard.writeText(json).then(() => {
-                alert('JSON copied to clipboard!');
-              }).catch(() => {
-                prompt('Copy the JSON below:', json);
-              });
-            } catch {
-              prompt('Copy the JSON below:', json);
-            }
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'workflow.json';
+            a.click();
+            URL.revokeObjectURL(url);
           }}
           className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium rounded-md bg-primary text-primary-foreground workflow-shadow hover:opacity-90 transition-opacity"
         >
