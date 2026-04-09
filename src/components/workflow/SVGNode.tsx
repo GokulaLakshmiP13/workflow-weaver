@@ -85,14 +85,19 @@ export function SVGNode({ node, isSelected, onMouseDown, onConnectorMouseDown, o
         {cfg.description}
       </text>
 
-      {/* Input connector (top) */}
+      {/* Input connector (top) — large invisible hit area + visible circle */}
       <circle
-        cx={w / 2} cy={0} r={CONNECTOR_RADIUS}
-        fill="white" stroke="#c8ccd4" strokeWidth={1.5}
+        cx={w / 2} cy={0} r={20}
+        fill="transparent" stroke="none"
         style={{ cursor: 'crosshair' }}
         onMouseUp={(e) => { e.stopPropagation(); onConnectorMouseUp(e, node.id, 'input'); }}
       />
-      <circle cx={w / 2} cy={0} r={2.5} fill="#c8ccd4" />
+      <circle
+        cx={w / 2} cy={0} r={CONNECTOR_RADIUS}
+        fill="white" stroke="#c8ccd4" strokeWidth={1.5}
+        style={{ cursor: 'crosshair', pointerEvents: 'none' }}
+      />
+      <circle cx={w / 2} cy={0} r={2.5} fill="#c8ccd4" style={{ pointerEvents: 'none' }} />
 
       {/* Output connector (bottom) */}
       <circle
