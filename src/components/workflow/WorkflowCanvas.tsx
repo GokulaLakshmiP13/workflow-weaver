@@ -5,7 +5,7 @@ import { SVGEdge, SVGTempEdge } from './SVGEdge';
 import { NodeConfigModal } from './NodeConfigModal';
 import { NODE_WIDTH, NODE_HEIGHT } from '@/lib/workflow-constants';
 import { NodeType, WorkflowNode } from '@/lib/workflow-manager';
-import { Code2, Copy, X } from 'lucide-react';
+import { Code2, Download, X } from 'lucide-react';
 
 interface DragState {
   type: 'node';
@@ -174,7 +174,7 @@ export function WorkflowCanvas() {
           }}
           className="flex items-center gap-1.5 px-2.5 py-1.5 text-[12px] font-medium rounded-md bg-primary text-primary-foreground workflow-shadow hover:opacity-90 transition-opacity"
         >
-          <Copy size={13} />
+          <Download size={13} />
           Export
         </button>
       </div>
